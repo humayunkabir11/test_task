@@ -1,8 +1,14 @@
+
 import 'package:fpdart/fpdart.dart';
 import '../../../../core/error/failures.dart';
-import '../usecase/home_usecase.dart';
-import '../../../../core/common/models/success_response.dart';
+import '../../data/models/home_data-response_model.dart';
+import '../../data/models/product_list_response_model.dart';
 
 abstract class HomeRepository {
-  Future<Either<Failure, SuccessResponse?>> login(GetHomeParams params);
+  Future<Either<Failure, HomeDataResponseModel>> getHomeData();
+  Future<Either<Failure, ProductListResponseModel>> getProducts({
+    int page = 1,
+    String? search,
+    int? categoryId,
+  });
 }

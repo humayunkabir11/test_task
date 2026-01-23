@@ -14,6 +14,9 @@ import 'package:flutter/widgets.dart';
 class $AssetsIconsGen {
   const $AssetsIconsGen();
 
+  /// File path: assets/icons/icFilter.svg
+  String get icFilter => 'assets/icons/icFilter.svg';
+
   /// File path: assets/icons/ic_arrow_back.svg
   String get icArrowBack => 'assets/icons/ic_arrow_back.svg';
 
@@ -46,6 +49,7 @@ class $AssetsIconsGen {
 
   /// List of all assets
   List<String> get values => [
+    icFilter,
     icArrowBack,
     icCart,
     icHeart,
@@ -99,11 +103,36 @@ class $AssetsImagesGen {
   ];
 }
 
+class $AssetsLottieGen {
+  const $AssetsLottieGen();
+
+  /// File path: assets/lottie/loading.json
+  String get loading => 'assets/lottie/loading.json';
+
+  /// List of all assets
+  List<String> get values => [loading];
+}
+
+class $AssetsTranslationsGen {
+  const $AssetsTranslationsGen();
+
+  /// File path: assets/translations/ar-EG.json
+  String get arEG => 'assets/translations/ar-EG.json';
+
+  /// File path: assets/translations/en-US.json
+  String get enUS => 'assets/translations/en-US.json';
+
+  /// List of all assets
+  List<String> get values => [arEG, enUS];
+}
+
 class Assets {
   const Assets._();
 
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
+  static const $AssetsLottieGen lottie = $AssetsLottieGen();
+  static const $AssetsTranslationsGen translations = $AssetsTranslationsGen();
 }
 
 class AssetGenImage {

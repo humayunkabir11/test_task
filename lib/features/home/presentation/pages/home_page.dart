@@ -1,143 +1,204 @@
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
-import 'package:testing/core/common/widgets/appbar/custom_appbar.dart';
-import 'package:testing/core/common/widgets/field/custom_text_field.dart';
-import 'package:testing/core/config/theme/style.dart';
-import '../../../../core/config/routes/route_path.dart';
-import '../../../../core/custom_assets/assets.gen.dart';
-import '../widgets/category_item.dart';
-import '../widgets/produc_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/di/init_dependencies.dart';
+import '../../data/models/home_data-response_model.dart';
+import '../bloc/home_bloc.dart';
+import 'all_product_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return BlocProvider(
+      create: (context) => sl<HomeBloc>()..add(LoadHomeDataEvent()),
       child: Scaffold(
-        backgroundColor: Color(0xffF8F8F8),
-        appBar: CustomAppBar(
-          backgroundColor: Color(0xffF8F8F8),
-          title: CustomTextField(
-            hintText: "Search products",
-            enabled: true,
-            filledColor: Colors.white,
-            prefixIcon: Assets.icons.icSearch.svg(),
-          ),
+        appBar: AppBar(
+          title: const Text('Home'),
         ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-           // padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // --- Categories Header ---
-                Container(
-                  color: Colors.white,
-                  padding: EdgeInsets.only(left: 20,right: 20,bottom: 16),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                           Text(
-                            'Categories',
-                            style: interSemiBold.copyWith(
-                              fontSize: 18,
-                              color: Color(0xff222222),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              context.pushNamed(RoutePath.allProductPage);
-                            },
-                            child:  Text(
-                              'See all',
-                              style: TextStyle(color: Color(0xff797979),fontSize: 18),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      // --- Categories List ---
-                      const SizedBox(height: 10),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CategoryItem(
-                            icon: Icons.battery_charging_full,
-                            title: 'Mobile',
-                          ),
-                          CategoryItem(
-                            icon: Icons.videogame_asset_outlined,
-                            title: 'Gaming',
-                          ),
-                          CategoryItem(
-                            icon: Icons.camera_alt_outlined,
-                            title: 'Images',
-                          ),
-                          CategoryItem(icon: Icons.car_repair, title: 'Vehicles'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // --- New Arrivals Header ---
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            if (state is HomeLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is HomeError) {
+              return Center(child: Text(state.message));
+            } else if (state is HomeLoaded) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-                     Padding(
-                       padding: const EdgeInsets.only(left: 16.0,right: 4),
-                       child: Text(
-                        'New Arrivals',
-                        style: interSemiBold.copyWith(
-                          fontSize: 18,
-                          color: Color(0xff222222)
+                    if (state.homeData.homepageCategories != null &&
+                        state.homeData.homepageCategories!.isNotEmpty) ...[
+                      const Text(
+                        'Categories',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        height: 100,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: state.homeData.homepageCategories!.length,
+                          itemBuilder: (context, index) {
+                            final category =
+                                state.homeData.homepageCategories![index];
+                            return Container(
+                              width: 80,
+                              margin: const EdgeInsets.only(right: 10),
+                              child: Column(
+                                children: [
+                                  // Placeholder for icon/image since standard Image.network might fail if url is broken/relative
+                                  // API returns relative paths like "uploads/..." usually need base url.
+                                  // Assuming base url is https://mamunuiux.com/flutter_task/
+                                  CircleAvatar(
+                                    radius: 30,
+                                    backgroundImage: category.image != null
+                                        ? NetworkImage(
+                                            'https://mamunuiux.com/flutter_task/${category.image}')
+                                        : null,
+                                    child: category.image == null
+                                        ? const Icon(Icons.category)
+                                        : null,
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    category.name ?? '',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
                         ),
-                                           ),
-                     ),
-                    IconButton(
-                      icon: Assets.icons.icFilter.svg(),
-                      onPressed: () {},
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'New Arrivals',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AllProductPage(),
+                              ),
+                            );
+                          },
+                          child: const Text('See All'),
+                        ),
+                      ],
                     ),
+                    const SizedBox(height: 10),
+                    if (state.homeData.newArrivalProducts != null)
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.7,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemCount: state.homeData.newArrivalProducts!.length,
+                        itemBuilder: (context, index) {
+                          final product =
+                              state.homeData.newArrivalProducts![index];
+                          return Card(
+                            elevation: 2,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      image: product.thumbImage != null
+                                          ? DecorationImage(
+                                              image: NetworkImage(
+                                                  'https://mamunuiux.com/flutter_task/${product.thumbImage}'),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : null,
+                                      color:
+                                          Colors.grey[200], // Placeholder color
+                                    ),
+                                    child: product.thumbImage == null
+                                        ? const Icon(Icons.image, size: 50)
+                                        : null,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        product.name ?? 'No Name',
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        'Qty: ${product.qty}',
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.grey),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '\$${product.offerPrice ?? product.price}',
+                                            style: const TextStyle(
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          if (product.offerPrice != null &&
+                                              product.price != null) ...[
+                                            const SizedBox(width: 5),
+                                            Text(
+                                              '\$${product.price}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                                decoration:
+                                                    TextDecoration.lineThrough,
+                                              ),
+                                            ),
+                                          ]
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                   ],
                 ),
-
-                // --- Product Grid ---
-                GridView.builder(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 6,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.7,
-                    crossAxisSpacing: 14,
-                    mainAxisSpacing: 16,
-                  ),
-                  itemBuilder: (context, index) {
-                    return  ProductCard(
-                      onTap: (){
-                        context.pushNamed(RoutePath.productDetailsPage);
-                      },
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
     );
   }
 }
-
-
-
