@@ -7,8 +7,11 @@ import 'data/repositories/home_repository_impl.dart';
 import 'domain/repositories/home_repository.dart';
 import 'domain/usecase/get_home_data_usecase.dart';
 import 'domain/usecase/get_products_usecase.dart';
+import 'domain/usecase/get_products_usecase.dart';
+import 'domain/usecase/get_product_details_usecase.dart';
 import 'presentation/bloc/all_product_bloc.dart';
 import 'presentation/bloc/home_bloc.dart';
+import 'presentation/bloc/product_details_bloc.dart';
 
 class HomeInjector {
   /// Initialize Home feature dependencies
@@ -35,9 +38,13 @@ class HomeInjector {
     sl.registerLazySingleton(
       () => GetProductsUseCase(sl<HomeRepository>()),
     );
+    sl.registerLazySingleton(
+      () => GetProductDetailsUseCase(sl<HomeRepository>()),
+    );
 
     // Blocs
     sl.registerFactory(() => HomeBloc(getHomeDataUseCase: sl<GetHomeDataUseCase>()));
     sl.registerFactory(() => AllProductBloc(getProductsUseCase: sl<GetProductsUseCase>()));
+    sl.registerFactory(() => ProductDetailsBloc(getProductDetailsUseCase: sl<GetProductDetailsUseCase>()));
   }
 }

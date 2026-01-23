@@ -7,6 +7,7 @@ import '../../domain/repositories/home_repository.dart';
 import '../datasources/home_remote_data_source.dart';
 import '../models/home_data-response_model.dart';
 import '../models/product_list_response_model.dart';
+import '../models/product_details_response_model.dart';
 
 class HomeRepositoryImpl implements HomeRepository {
   final HomeRemoteDataSource remoteSource;
@@ -47,6 +48,21 @@ class HomeRepositoryImpl implements HomeRepository {
         search: search,
         categoryId: categoryId,
       );
+      return right(data);
+    } on ServerException catch (e) {
+      return left(Failure(message: e.message));
+    } catch (e) {
+      return left(Failure(message: "Something went wrong"));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ProductDetailsResponseModel>> getProductDetails(String slug) async {
+    try {
+      if (!await (connectionChecker.isConnected)) {
+        return left(Failure(message: "no internet connection!!"));
+      }
+      final data = await remoteSource.getProductDetails(slug);
       return right(data);
     } on ServerException catch (e) {
       return left(Failure(message: e.message));

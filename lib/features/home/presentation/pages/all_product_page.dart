@@ -8,14 +8,19 @@ import '../../../../core/common/widgets/field/custom_text_field.dart';
 import '../../../../core/custom_assets/assets.gen.dart';
 import '../../../../core/di/init_dependencies.dart';
 import '../bloc/all_product_bloc.dart';
+import 'product_details_page.dart';
 
 class AllProductPage extends StatelessWidget {
-  const AllProductPage({super.key});
+  final int? categoryId;
+  const AllProductPage({super.key, this.categoryId});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<AllProductBloc>()..add(LoadProductsEvent()),
+      create: (context) => sl<AllProductBloc>()
+        ..add(categoryId != null
+            ? FilterProductsByCategoryEvent(categoryId!)
+            : LoadProductsEvent()),
       child: const _AllProductView(),
     );
   }
@@ -138,11 +143,17 @@ class _AllProductViewState extends State<_AllProductView> {
                          );
                       }
                       final product = state.products[index];
-                       return Card(
-                            elevation: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                       return GestureDetector(
+                         onTap: () {
+                           if(product.slug != null) {
+                             Navigator.push(context, MaterialPageRoute(builder: (_) => ProductDetailsPage(slug: product.slug!)));
+                           }
+                         },
+                         child: Card(
+                              elevation: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
                                 Expanded(
                                   child: Container(
                                     width: double.infinity,
@@ -204,7 +215,7 @@ class _AllProductViewState extends State<_AllProductView> {
                                 ),
                               ],
                             ),
-                          );
+                          ));
                     },
                   );
                 }

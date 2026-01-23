@@ -48,8 +48,10 @@ class AppRoute {
       GoRoute(
         name: RoutePath.productDetailsPage,
         path: RoutePath.productDetailsPagePath,
-        pageBuilder: (context, state) =>
-            NoTransitionPage(child: ProductDetailsPage()),
+        pageBuilder: (context, state) {
+          final slug = state.extra as String? ?? ''; 
+          return NoTransitionPage(child: ProductDetailsPage(slug: slug));
+        },
       ),
       //select role route
       GoRoute(
