@@ -26,76 +26,17 @@ class _MessageState extends State<Message> {
     // TODO: implement initState
     super.initState();
 
-    context.read<ChatBloc>().add(
-      FetchConversationsEvent(params: GetChatParams()),
-    );
+
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        title: Text("Chat"),
-        centerTitle: true,
-        height: 60.h,
-      ),
-      body: RefreshIndicator.adaptive(
-        onRefresh: () async {
-          context.read<ChatBloc>().add(
-            FetchConversationsEvent(params: GetChatParams()),
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ///--------------------------search bar
-              CustomTextField(
-                prefixIcon: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Assets.icons.icMessage.svg(height: 16, width: 16),
-                ),
-                filledColor: Color(0xFFE7F0EF).withValues(alpha: 0.46),
-                borderRadius: 8,
-                hintText: "Search",
-              ),
-
-              ///----------------------conversation list
-              const Gap(6),
-              Expanded(
-                child: BlocSelector<ChatBloc, ChatState, List<InboxData>?>(
-                  selector: (state) {
-                    if (state is ConversationsLoadedState) {
-                      return state.conversations;
-                    }
-                    return null;
-                  },
-                  builder: (context, conversations) {
-                    if (conversations == null) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    // if (conversations.isEmpty) {
-                    //   return const EmptyWidget();
-                    // }
-                    return ListView.builder(
-                      itemCount: conversations.length,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return ChatTile(
-                          onTap: () {},
-                          chat: conversations[index],
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+    return  Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: Text("Message"),
         ),
-      ),
+        body: Center(child: Text("Message"))
     );
   }
 }

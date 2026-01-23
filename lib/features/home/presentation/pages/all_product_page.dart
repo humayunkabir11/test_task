@@ -1,6 +1,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import '../../../../core/common/widgets/appbar/custom_appbar.dart';
+import '../../../../core/common/widgets/field/custom_text_field.dart';
+import '../../../../core/custom_assets/assets.gen.dart';
 import '../../../../core/di/init_dependencies.dart';
 import '../bloc/all_product_bloc.dart';
 
@@ -56,37 +61,39 @@ class _AllProductViewState extends State<_AllProductView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('All Products'),
+      appBar: CustomAppBar(
+        title: Text("All Products"),
+        centerTitle: true,
+        height: 60.h,
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
+            padding: EdgeInsets.all(16.w),
+            child: CustomTextField(
               controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search products...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                suffixIcon: IconButton(
+              hintText: 'Search products...',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Assets.icons.icSearch.svg(height: 16.h, width: 16.w),
+              ),
+              filledColor: const Color(0xFFE7F0EF).withValues(alpha: 0.46),
+              borderRadius: 8,
+              onFieldSubmitted: (query) {
+                if(query.isNotEmpty) {
+                    context.read<AllProductBloc>().add(SearchProductsEvent(query));
+                }
+              },
+              suffixIcon: IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                      _searchController.clear();
                      context.read<AllProductBloc>().add(LoadProductsEvent());
                   },
-                )
-              ),
-              onSubmitted: (query) {
-                if(query.isNotEmpty) {
-                    context.read<AllProductBloc>().add(SearchProductsEvent(query));
-                }
-              },
+              )
             ),
           ),
-          // Category filter can be added here if needed, keeping it simple for now based on user flow request
+          
           Expanded(
             child: BlocBuilder<AllProductBloc, AllProductState>(
               builder: (context, state) {
@@ -112,20 +119,23 @@ class _AllProductViewState extends State<_AllProductView> {
                   }
                   return GridView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10.w),
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                        SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.7,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 10.w,
+                      mainAxisSpacing: 10.h,
                     ),
                     itemCount: state.hasReachedMax
                         ? state.products.length
                         : state.products.length + 1,
                     itemBuilder: (context, index) {
                       if (index >= state.products.length) {
-                        return const Center(child: CircularProgressIndicator());
+                         return Padding(
+                           padding: EdgeInsets.all(8.0.w),
+                           child: const Center(child: CircularProgressIndicator()),
+                         );
                       }
                       final product = state.products[index];
                        return Card(
@@ -153,7 +163,7 @@ class _AllProductViewState extends State<_AllProductView> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.all(8.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -165,7 +175,7 @@ class _AllProductViewState extends State<_AllProductView> {
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      const SizedBox(height: 5),
+                                      Gap(5.h),
                                       Row(
                                         children: [
                                           Text(
@@ -179,8 +189,8 @@ class _AllProductViewState extends State<_AllProductView> {
                                             const SizedBox(width: 5),
                                             Text(
                                               '\$${product.price}',
-                                              style: const TextStyle(
-                                                fontSize: 12,
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
                                                 color: Colors.grey,
                                                 decoration:
                                                     TextDecoration.lineThrough,

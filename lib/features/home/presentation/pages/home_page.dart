@@ -1,6 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import '../../../../core/common/widgets/appbar/custom_appbar.dart';
 import '../../../../core/di/init_dependencies.dart';
 import '../../data/models/home_data-response_model.dart';
 import '../bloc/home_bloc.dart';
@@ -14,8 +17,11 @@ class HomePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => sl<HomeBloc>()..add(LoadHomeDataEvent()),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Home'),
+        appBar: CustomAppBar(
+          title: Text("Home"),
+          centerTitle: true,
+          height: 60.h,
+          automaticallyImplyLeading: false, 
         ),
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
@@ -25,20 +31,20 @@ class HomePage extends StatelessWidget {
               return Center(child: Text(state.message));
             } else if (state is HomeLoaded) {
               return SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (state.homeData.homepageCategories != null &&
                         state.homeData.homepageCategories!.isNotEmpty) ...[
-                      const Text(
+                      Text(
                         'Categories',
                         style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                            fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 10),
+                      Gap(10.h),
                       SizedBox(
-                        height: 100,
+                        height: 100.h,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: state.homeData.homepageCategories!.length,
@@ -46,15 +52,12 @@ class HomePage extends StatelessWidget {
                             final category =
                                 state.homeData.homepageCategories![index];
                             return Container(
-                              width: 80,
-                              margin: const EdgeInsets.only(right: 10),
+                              width: 80.w,
+                              margin: EdgeInsets.only(right: 10.w),
                               child: Column(
                                 children: [
-                                  // Placeholder for icon/image since standard Image.network might fail if url is broken/relative
-                                  // API returns relative paths like "uploads/..." usually need base url.
-                                  // Assuming base url is https://mamunuiux.com/flutter_task/
                                   CircleAvatar(
-                                    radius: 30,
+                                    radius: 30.r,
                                     backgroundImage: category.image != null
                                         ? NetworkImage(
                                             'https://mamunuiux.com/flutter_task/${category.image}')
@@ -63,12 +66,12 @@ class HomePage extends StatelessWidget {
                                         ? const Icon(Icons.category)
                                         : null,
                                   ),
-                                  const SizedBox(height: 5),
+                                  Gap(5.h),
                                   Text(
                                     category.name ?? '',
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 12),
+                                    style: TextStyle(fontSize: 12.sp),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -77,15 +80,15 @@ class HomePage extends StatelessWidget {
                           },
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      Gap(20.h),
                     ],
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'New Arrivals',
                           style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                              fontSize: 18.sp, fontWeight: FontWeight.bold),
                         ),
                         TextButton(
                           onPressed: () {
@@ -100,17 +103,17 @@ class HomePage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    Gap(10.h),
                     if (state.homeData.newArrivalProducts != null)
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                             SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 0.7,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
+                          crossAxisSpacing: 10.w,
+                          mainAxisSpacing: 10.h,
                         ),
                         itemCount: state.homeData.newArrivalProducts!.length,
                         itemBuilder: (context, index) {
@@ -141,7 +144,7 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.all(8.w),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -153,13 +156,13 @@ class HomePage extends StatelessWidget {
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
-                                      const SizedBox(height: 5),
+                                      Gap(5.h),
                                       Text(
                                         'Qty: ${product.qty}',
-                                        style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey),
+                                        style: TextStyle(
+                                            fontSize: 12.sp, color: Colors.grey),
                                       ),
-                                      const SizedBox(height: 5),
+                                      Gap(5.h),
                                       Row(
                                         children: [
                                           Text(
@@ -170,11 +173,11 @@ class HomePage extends StatelessWidget {
                                           ),
                                           if (product.offerPrice != null &&
                                               product.price != null) ...[
-                                            const SizedBox(width: 5),
+                                            Gap(5.w),
                                             Text(
                                               '\$${product.price}',
-                                              style: const TextStyle(
-                                                fontSize: 12,
+                                              style: TextStyle(
+                                                fontSize: 12.sp,
                                                 color: Colors.grey,
                                                 decoration:
                                                     TextDecoration.lineThrough,
