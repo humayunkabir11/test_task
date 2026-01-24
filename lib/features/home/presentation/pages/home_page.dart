@@ -1,28 +1,99 @@
 
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:testing/core/config/routes/route_path.dart';
+import 'package:testing/core/config/theme/style.dart';
 import '../../../../core/common/widgets/appbar/custom_appbar.dart';
+import '../../../../core/common/widgets/field/custom_text_field.dart';
+import '../../../../core/custom_assets/assets.gen.dart';
 import '../../../../core/di/init_dependencies.dart';
 import '../../data/models/home_data-response_model.dart';
 import '../bloc/home_bloc.dart';
 import 'all_product_page.dart';
 import 'product_details_page.dart';
+import '../widgets/produc_card.dart';
+import '../widgets/category_item.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late TextEditingController _searchController;
+  Timer? _debounce;
+  late HomeBloc _homeBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _homeBloc = sl<HomeBloc>()..add(LoadHomeDataEvent());
+    _searchController.addListener(() {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _debounce?.cancel();
+    _homeBloc.close();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+        if (query.isNotEmpty) {
+          _homeBloc.add(SearchProductsEvent(query));
+        } else {
+          _homeBloc.add(LoadProductsEvent());
+        }
+    });
+  }
+
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<HomeBloc>()..add(LoadHomeDataEvent()),
+    return BlocProvider.value(
+      value: _homeBloc,
       child: Scaffold(
         appBar: CustomAppBar(
-          title: Text("Home"),
+          title: CustomTextField(
+            controller: _searchController,
+            hintText: 'Search products',
+            textInputAction: TextInputAction.search,
+            prefixIcon: Assets.icons.icSearch.svg(height: 16.h, width: 16.w),
+            filledColor: Colors.white,
+            enabled: true,
+            borderRadius: 8,
+            onChanged: _onSearchChanged,
+            onFieldSubmitted: (query) {
+              if (_debounce?.isActive ?? false) _debounce!.cancel();
+              if (query.isNotEmpty) {
+                _homeBloc.add(SearchProductsEvent(query));
+              }
+            },
+            suffixIcon: _searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      if (_debounce?.isActive ?? false) _debounce!.cancel();
+                      _searchController.clear();
+                      _homeBloc.add(LoadProductsEvent());
+                    },
+                  )
+                : SizedBox.shrink(),
+          ),
           centerTitle: true,
-          height: 60.h,
-          automaticallyImplyLeading: false, 
+          automaticallyImplyLeading: false,
         ),
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
@@ -32,190 +103,114 @@ class HomePage extends StatelessWidget {
               return Center(child: Text(state.message));
             } else if (state is HomeLoaded) {
               return SingleChildScrollView(
-                padding: EdgeInsets.all(16.w),
+                // padding: EdgeInsets.all(16.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Gap(16),
                     if (state.homeData.homepageCategories != null &&
                         state.homeData.homepageCategories!.isNotEmpty) ...[
-                      Text(
-                        'Categories',
-                        style: TextStyle(
-                            fontSize: 18.sp, fontWeight: FontWeight.bold),
-                      ),
-                      Gap(10.h),
-                      SizedBox(
-                        height: 100.h,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: state.homeData.homepageCategories!.length,
-                          itemBuilder: (context, index) {
-                            final category =
-                                state.homeData.homepageCategories![index];
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AllProductPage(categoryId: category.id),
+                      Container(
+                        height: 162.h,
+                        padding: EdgeInsets.only(
+                            bottom: 8.h, left: 20.w, right: 20.w),
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Categories',
+                                  style: interSemiBold.copyWith(
+                                    color: Color(0xff222222),
+                                    fontSize: 18.sp,
                                   ),
-                                );
-                              },
-                              child: Container(
-                                width: 80.w,
-                                margin: EdgeInsets.only(right: 10.w),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 30.r,
-                                      backgroundImage: category.image != null
-                                          ? NetworkImage(
-                                              'https://mamunuiux.com/flutter_task/${category.image}')
-                                          : null,
-                                      child: category.image == null
-                                          ? const Icon(Icons.category)
-                                          : null,
-                                    ),
-                                    Gap(5.h),
-                                    Text(
-                                      category.name ?? '',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(fontSize: 12.sp),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
                                 ),
+                                TextButton(
+                                  onPressed: () {
+                                    context.pushNamed(RoutePath.allProductPage,
+                                        extra: null);
+                                  },
+                                  child: Text(
+                                    'See All',
+                                    style: interRegular.copyWith(
+                                        color: Color(0xff797979),
+                                        fontSize: 18.sp),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 95.h,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const BouncingScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                itemCount:
+                                    state.homeData.homepageCategories!.length,
+                                itemBuilder: (context, index) {
+                                  final category =
+                                      state.homeData.homepageCategories![index];
+                                  return CategoryItem(
+                                    category: category,
+                                    onTap: () {
+                                      context.pushNamed(RoutePath.allProductPage,
+                                          extra: category.id);
+                                    },
+                                  );
+                                },
                               ),
-                            );
-                          },
+                            ),
+                          ],
                         ),
                       ),
-                      Gap(20.h),
+                      Gap(20),
                     ],
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'New Arrivals',
-                          style: TextStyle(
-                              fontSize: 18.sp, fontWeight: FontWeight.bold),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AllProductPage(),
-                              ),
-                            );
-                          },
-                          child: const Text('See All'),
-                        ),
-                      ],
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'New Arrivals',
+                            style: interSemiBold.copyWith(
+                              color: Color(0xff222222),
+                              fontSize: 18.sp,
+                            ),
+                          ),
+                          Assets.icons.icFilter.svg()
+                        ],
+                      ),
                     ),
                     Gap(10.h),
                     if (state.homeData.newArrivalProducts != null)
+
                       GridView.builder(
                         shrinkWrap: true,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.w, vertical: 12.h),
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
-                             SliverGridDelegateWithFixedCrossAxisCount(
+                            SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 0.7,
-                          crossAxisSpacing: 10.w,
-                          mainAxisSpacing: 10.h,
+                          crossAxisSpacing: 14.w,
+                          mainAxisSpacing: 16.h,
                         ),
                         itemCount: state.homeData.newArrivalProducts!.length,
                         itemBuilder: (context, index) {
                           final product =
                               state.homeData.newArrivalProducts![index];
-                          return GestureDetector(
+                          return ProductCard(
+                            product: product,
                             onTap: () {
                               if (product.slug != null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ProductDetailsPage(
-                                      slug: product.slug!,
-                                    ),
-                                  ),
-                                );
+                                context.pushNamed(
+                                    RoutePath.productDetailsPage,
+                                    extra: product.slug);
                               }
                             },
-                            child: Card(
-                              elevation: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        image: product.thumbImage != null
-                                            ? DecorationImage(
-                                                image: NetworkImage(
-                                                    'https://mamunuiux.com/flutter_task/${product.thumbImage}'),
-                                                fit: BoxFit.cover,
-                                              )
-                                            : null,
-                                        color:
-                                            Colors.grey[200], // Placeholder color
-                                      ),
-                                      child: product.thumbImage == null
-                                          ? const Icon(Icons.image, size: 50)
-                                          : null,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(8.w),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          product.name ?? 'No Name',
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Gap(5.h),
-                                        Text(
-                                          'Qty: ${product.qty}',
-                                          style: TextStyle(
-                                              fontSize: 12.sp, color: Colors.grey),
-                                        ),
-                                        Gap(5.h),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              '\$${product.offerPrice ?? product.price}',
-                                              style: const TextStyle(
-                                                  color: Colors.blue,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            if (product.offerPrice != null &&
-                                                product.price != null) ...[
-                                              Gap(5.w),
-                                              Text(
-                                                '\$${product.price}',
-                                                style: TextStyle(
-                                                  fontSize: 12.sp,
-                                                  color: Colors.grey,
-                                                  decoration:
-                                                      TextDecoration.lineThrough,
-                                                ),
-                                              ),
-                                            ]
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                           );
                         },
                       ),

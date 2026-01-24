@@ -31,7 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.centerTitle = false,
     this.automaticallyImplyLeading = true,
-    this.backgroundColor = AppColors.whiteColor,
+    this.backgroundColor,
     this.actions,
     this.leadingColor,
     this.backButtonColor = const Color(0xFF444444),
@@ -70,7 +70,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   context.pop();
                 },
                 child: Padding(
-                  padding: EdgeInsetsGeometry.all(10),
+                  padding: EdgeInsetsGeometry.all(12),
                   child: Container(
                     height: 30,
                     width: 30,

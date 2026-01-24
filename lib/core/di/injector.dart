@@ -37,15 +37,11 @@ Future<void> initDependencies() async {
   );
 
   ///don't remove this comment
-  //[FEATURE_INJECTORS]
-
-  await AuthInjector.init(); // registers Auth feature
 
   await ProfileInjector.init(); // registers Profile feature
 
   await ChatInjector.init(); // registers Chat feature
-
-  await AttendanceInjector.init(); // registers Attendance feature
+  // registers Attendance feature
 
   await HomeInjector.init(); // registers Home feature
 

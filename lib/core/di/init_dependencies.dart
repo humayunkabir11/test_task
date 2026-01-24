@@ -2,11 +2,8 @@ import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import '../../features/main/main_injector.dart';
 import '../../features/home/home_injector.dart';
-import '../../features/attendance/attendance_injector.dart';
 import '../../features/chat/chat_injector.dart';
 import '../../features/profile/profile_injector.dart';
-import '../../features/auth/auth_injector.dart';
-
 import '../config/routes/app_route.dart';
 import '../config/routes/route_path.dart';
 import '../config/strings/api_endpoint.dart';

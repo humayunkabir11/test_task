@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:testing/features/home/presentation/pages/product_details_page.dart';
-import '../../../features/attendance/presentation/pages/attendance_page.dart';
-import '../../../features/auth/presentation/pages/auth_page.dart';
-import '../../../features/auth/presentation/pages/role/select_role_page.dart';
 import '../../../features/chat/presentation/pages/chat_page.dart';
 import '../../../features/chat/presentation/pages/message_page.dart';
 import '../../../features/home/presentation/pages/all_product_page.dart';
@@ -38,28 +35,30 @@ class AppRoute {
         builder: (context, state) => MessagePage(),
       ),
 
-      //select role route
-      GoRoute(
-        name: RoutePath.selectRolePage,
-        path: RoutePath.selectRolePagePath,
-        builder: (context, state) => SelectRolePage(),
-      ),
 
       GoRoute(
         name: RoutePath.productDetailsPage,
         path: RoutePath.productDetailsPagePath,
         pageBuilder: (context, state) {
           final slug = state.extra as String? ?? ''; 
-          return NoTransitionPage(child: ProductDetailsPage(slug: slug));
+          return NoTransitionPage(child: ProductDetailsPage(slug: state.extra as String,));
         },
       ),
       //select role route
       GoRoute(
         name: RoutePath.allProductPage,
         path: RoutePath.allProductPagePath,
-        pageBuilder: (context, state) =>
-            NoTransitionPage(child: AllProductPage()),
+        pageBuilder: (context, state) {
+          final int? categoryId = state.extra as int?;
+
+          return NoTransitionPage(
+            child: AllProductPage(
+              categoryId: categoryId, // nullable
+            ),
+          );
+        },
       ),
+
 
       // ///main page route
       StatefulShellRoute.indexedStack(

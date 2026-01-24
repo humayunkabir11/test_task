@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:testing/core/config/routes/route_path.dart';
 import '../../../../core/common/widgets/appbar/custom_appbar.dart';
 import '../../../../core/common/widgets/field/custom_text_field.dart';
 import '../../../../core/custom_assets/assets.gen.dart';
 import '../../../../core/di/init_dependencies.dart';
 import '../bloc/all_product_bloc.dart';
 import 'product_details_page.dart';
+import '../widgets/produc_card.dart';
 
 class AllProductPage extends StatelessWidget {
-  final int? categoryId;
+  final int ? categoryId;
   const AllProductPage({super.key, this.categoryId});
 
   @override
@@ -41,6 +44,9 @@ class _AllProductViewState extends State<_AllProductView> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _searchController.addListener(() {
+      setState(() {});
+    });
   }
 
   @override
@@ -67,9 +73,7 @@ class _AllProductViewState extends State<_AllProductView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: Text("All Products"),
-        centerTitle: true,
-        height: 60.h,
+        title: const Text("All Product"),
       ),
       body: Column(
         children: [
@@ -77,25 +81,24 @@ class _AllProductViewState extends State<_AllProductView> {
             padding: EdgeInsets.all(16.w),
             child: CustomTextField(
               controller: _searchController,
-              hintText: 'Search products...',
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Assets.icons.icSearch.svg(height: 16.h, width: 16.w),
-              ),
-              filledColor: const Color(0xFFE7F0EF).withValues(alpha: 0.46),
+              hintText: 'Search products',
+              textInputAction: TextInputAction.search,
+              prefixIcon:Assets.icons.icSearch.svg(height: 16.h, width: 16.w),
+              filledColor: Colors.white,
               borderRadius: 8,
               onFieldSubmitted: (query) {
                 if(query.isNotEmpty) {
                     context.read<AllProductBloc>().add(SearchProductsEvent(query));
                 }
               },
-              suffixIcon: IconButton(
+              suffixIcon: _searchController.text.isNotEmpty ? IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
                      _searchController.clear();
                      context.read<AllProductBloc>().add(LoadProductsEvent());
                   },
               )
+            : SizedBox.shrink(),
             ),
           ),
           
@@ -129,8 +132,8 @@ class _AllProductViewState extends State<_AllProductView> {
                         SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.7,
-                      crossAxisSpacing: 10.w,
-                      mainAxisSpacing: 10.h,
+                      crossAxisSpacing: 14.w,
+                      mainAxisSpacing: 16.h,
                     ),
                     itemCount: state.hasReachedMax
                         ? state.products.length
@@ -143,79 +146,14 @@ class _AllProductViewState extends State<_AllProductView> {
                          );
                       }
                       final product = state.products[index];
-                       return GestureDetector(
+                       return ProductCard(
+                         product: product,
                          onTap: () {
                            if(product.slug != null) {
-                             Navigator.push(context, MaterialPageRoute(builder: (_) => ProductDetailsPage(slug: product.slug!)));
+                           context.pushNamed(RoutePath.productDetailsPage,extra: product.slug);
                            }
                          },
-                         child: Card(
-                              elevation: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                Expanded(
-                                  child: Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      image: product.thumbImage != null
-                                          ? DecorationImage(
-                                              image: NetworkImage(
-                                                  'https://mamunuiux.com/flutter_task/${product.thumbImage}'),
-                                              fit: BoxFit.cover,
-                                            )
-                                          : null,
-                                      color:
-                                          Colors.grey[200], // Placeholder color
-                                    ),
-                                    child: product.thumbImage == null
-                                        ? const Icon(Icons.image, size: 50)
-                                        : null,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(8.w),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        product.name ?? 'No Name',
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Gap(5.h),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            '\$${product.offerPrice ?? product.price}',
-                                            style: const TextStyle(
-                                                color: Colors.blue,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          if (product.offerPrice != null &&
-                                              product.price != null) ...[
-                                            const SizedBox(width: 5),
-                                            Text(
-                                              '\$${product.price}',
-                                              style: TextStyle(
-                                                fontSize: 12.sp,
-                                                color: Colors.grey,
-                                                decoration:
-                                                    TextDecoration.lineThrough,
-                                              ),
-                                            ),
-                                          ]
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ));
+                       );
                     },
                   );
                 }

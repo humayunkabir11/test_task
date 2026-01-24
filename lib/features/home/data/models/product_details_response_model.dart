@@ -5,9 +5,13 @@ import 'home_data-response_model.dart';
 class ProductDetailsResponseModel extends Equatable {
   final ProductDetailModel? product;
   final List<ProductModel>? relatedProducts;
-  // Add other fields if needed like gallery, reviews etc.
+  final List<GalleryModel>? gellery;
 
-  const ProductDetailsResponseModel({this.product, this.relatedProducts});
+  const ProductDetailsResponseModel({
+    this.product,
+    this.relatedProducts,
+    this.gellery,
+  });
 
   factory ProductDetailsResponseModel.fromJson(Map<String, dynamic> json) {
     return ProductDetailsResponseModel(
@@ -17,11 +21,33 @@ class ProductDetailsResponseModel extends Equatable {
       relatedProducts: (json['relatedProducts'] as List?)
           ?.map((e) => ProductModel.fromJson(e as Map<String, dynamic>))
           .toList(),
+      gellery: (json['gellery'] as List?)
+          ?.map((e) => GalleryModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   @override
-  List<Object?> get props => [product, relatedProducts];
+  List<Object?> get props => [product, relatedProducts, gellery];
+}
+
+class GalleryModel extends Equatable {
+  final int? id;
+  final int? productId;
+  final String? image;
+
+  const GalleryModel({this.id, this.productId, this.image});
+
+  factory GalleryModel.fromJson(Map<String, dynamic> json) {
+    return GalleryModel(
+      id: json['id'] as int?,
+      productId: json['product_id'] as int?,
+      image: json['image'] as String?,
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, productId, image];
 }
 
 class ProductDetailModel extends Equatable {

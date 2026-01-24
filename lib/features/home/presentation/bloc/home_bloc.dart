@@ -11,8 +11,12 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final GetHomeDataUseCase getHomeDataUseCase;
 
+  HomeDataResponseModel? _originalHomeData;
+
   HomeBloc({required this.getHomeDataUseCase}) : super(HomeInitial()) {
     on<LoadHomeDataEvent>(_onLoadHomeData);
+    on<SearchProductsEvent>(_onSearchProducts);
+    on<LoadProductsEvent>(_onLoadProducts);
   }
 
   Future<void> _onLoadHomeData(
@@ -23,7 +27,36 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     final result = await getHomeDataUseCase(NoParams());
     result.fold(
       (failure) => emit(HomeError(message: failure.message ?? "Something went wrong")),
-      (data) => emit(HomeLoaded(homeData: data)),
+      (data) {
+        _originalHomeData = data;
+        emit(HomeLoaded(homeData: data));
+      },
     );
+  }
+
+  void _onSearchProducts(
+    SearchProductsEvent event,
+    Emitter<HomeState> emit,
+  ) {
+    if (_originalHomeData != null) {
+      final filteredProducts = _originalHomeData!.newArrivalProducts?.where((product) {
+        return product.name?.toLowerCase().contains(event.query.toLowerCase()) ?? false;
+      }).toList();
+
+      final filteredData = HomeDataResponseModel(
+        homepageCategories: _originalHomeData!.homepageCategories,
+        newArrivalProducts: filteredProducts,
+      );
+      emit(HomeLoaded(homeData: filteredData));
+    }
+  }
+
+  void _onLoadProducts(
+    LoadProductsEvent event,
+    Emitter<HomeState> emit,
+  ) {
+    if (_originalHomeData != null) {
+      emit(HomeLoaded(homeData: _originalHomeData!));
+    }
   }
 }
