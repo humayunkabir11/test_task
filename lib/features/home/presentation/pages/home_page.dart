@@ -51,11 +51,11 @@ class _HomePageState extends State<HomePage> {
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-        if (query.isNotEmpty) {
-          _homeBloc.add(SearchProductsEvent(query));
-        } else {
-          _homeBloc.add(LoadProductsEvent());
-        }
+      if (query.isNotEmpty) {
+        _homeBloc.add(SearchProductsEvent(query));
+      } else {
+        _homeBloc.add(LoadProductsEvent());
+      }
     });
   }
 
@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage> {
       value: _homeBloc,
       child: Scaffold(
         appBar: CustomAppBar(
-            backgroundColor:  Color(0xffF8F8F8),
+          backgroundColor:  Color(0xffF8F8F8),
           title: CustomTextField(
             controller: _searchController,
             hintText: 'Search products',
@@ -102,20 +102,20 @@ class _HomePageState extends State<HomePage> {
             if (state is HomeLoading && state is! HomeLoaded) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is HomeError) {
-               if (state.message.toLowerCase().contains("no internet")) {
-                    return Center(child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.wifi_off, size: 60, color: Colors.grey),
-                         Gap(10),
-                        Text("No Internet Connection",style: interRegular.copyWith(color:Colors.grey),),
-                         Gap(10),
-                        ElevatedButton(onPressed: (){
-                             _homeBloc.add(LoadHomeDataEvent());
-                        }, child: const Text("Retry"))
-                      ],
-                    ));
-               }
+              if (state.message.toLowerCase().contains("no internet")) {
+                return Center(child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.wifi_off, size: 60, color: Colors.grey),
+                    Gap(10),
+                    Text("No Internet Connection",style: interRegular.copyWith(color:Colors.grey),),
+                    Gap(10),
+                    ElevatedButton(onPressed: (){
+                      _homeBloc.add(LoadHomeDataEvent());
+                    }, child: const Text("Retry"))
+                  ],
+                ));
+              }
               return Center(child: Text(state.message));
             } else if (state is HomeLoaded) {
               return SingleChildScrollView(
@@ -166,10 +166,10 @@ class _HomePageState extends State<HomePage> {
                                 physics: const BouncingScrollPhysics(),
                                 scrollDirection: Axis.horizontal,
                                 itemCount:
-                                    state.homeData.homepageCategories!.length,
+                                state.homeData.homepageCategories!.length,
                                 itemBuilder: (context, index) {
                                   final category =
-                                      state.homeData.homepageCategories![index];
+                                  state.homeData.homepageCategories![index];
                                   return CategoryItem(
                                     category: category,
                                     onTap: () {
@@ -207,13 +207,13 @@ class _HomePageState extends State<HomePage> {
 
                     if (state.homeData.newArrivalProducts != null)
                     /// ------------------ New Arrivals List ------------------>
-                        GridView.builder(
+                      GridView.builder(
                         shrinkWrap: true,
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.w, vertical: 12.h),
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
+                        SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 0.7,
                           crossAxisSpacing: 14.w,
@@ -222,7 +222,7 @@ class _HomePageState extends State<HomePage> {
                         itemCount: state.homeData.newArrivalProducts!.length,
                         itemBuilder: (context, index) {
                           final product =
-                              state.homeData.newArrivalProducts![index];
+                          state.homeData.newArrivalProducts![index];
                           return ProductCard(
                             product: product,
                             onTap: () {
