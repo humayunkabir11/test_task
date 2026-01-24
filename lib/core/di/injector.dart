@@ -28,6 +28,7 @@ Future<void> initDependencies() async {
         await sl<SecureStorageService>().deleteAll();
         await sl<SharedPrefService>().clear();
 
+
       },
       getToken: () {
         return sl<SecureStorageService>().read(SecureKeys.accessToken);
@@ -39,8 +40,6 @@ Future<void> initDependencies() async {
 
   await ProfileInjector.init(); // registers Profile feature
 
-  await ChatInjector.init(); // registers Chat feature
-  // registers Attendance feature
 
   await HomeInjector.init(); // registers Home feature
 

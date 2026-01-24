@@ -18,7 +18,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<SearchProductsEvent>(_onSearchProducts);
     on<LoadProductsEvent>(_onLoadProducts);
   }
-
+  ///------------------------------ home data load--------------------------->
   Future<void> _onLoadHomeData(
     LoadHomeDataEvent event,
     Emitter<HomeState> emit,
@@ -33,7 +33,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       },
     );
   }
-
+  ///-------------------------- SEARCH HOME DATA ------------------->
   void _onSearchProducts(
     SearchProductsEvent event,
     Emitter<HomeState> emit,

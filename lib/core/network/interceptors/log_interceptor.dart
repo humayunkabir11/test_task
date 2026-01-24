@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../utils/show_toast.dart';
+
 
 class AppLogInterceptor extends Interceptor {
   final JsonEncoder encoder = const JsonEncoder.withIndent('  ');
@@ -80,10 +80,8 @@ class AppLogInterceptor extends Interceptor {
     debugPrint("\x1B[31m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\x1B[0m");
 
     final message = extractMessage(err.response?.data);
-    showToast(message: message);
-    // if(message == "Employee not found"){
-    //   AppRouter.router.goNamed(Routes.loginPage);
-    // }
+
+
     super.onError(err, handler);
   }
 

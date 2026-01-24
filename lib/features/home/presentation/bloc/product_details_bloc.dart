@@ -13,7 +13,7 @@ class ProductDetailsBloc extends Bloc<ProductDetailsEvent, ProductDetailsState> 
         super(ProductDetailsInitial()) {
     on<LoadProductDetailsEvent>(_onLoadProductDetails);
   }
-
+  /// ----------- GET PRODUCT DETAILS ------------>
   Future<void> _onLoadProductDetails(
     LoadProductDetailsEvent event,
     Emitter<ProductDetailsState> emit,

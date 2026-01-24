@@ -157,6 +157,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
+
+                            /// ---------------- Categories list --------------->
                             SizedBox(
                               height: 95.h,
                               child: ListView.builder(
@@ -204,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                       const Center(child: Text('No products found')),
 
                     if (state.homeData.newArrivalProducts != null)
-
+                    /// ------------------ New Arrivals List ------------------>
                         GridView.builder(
                         shrinkWrap: true,
                         padding: EdgeInsets.symmetric(

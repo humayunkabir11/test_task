@@ -2,7 +2,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'dart:io';
 
-import 'package:logger/logger.dart';
+
 
 abstract interface class ConnectionChecker {
   Future<bool> get isConnected;

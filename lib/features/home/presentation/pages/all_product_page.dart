@@ -77,6 +77,7 @@ class _AllProductViewState extends State<_AllProductView> {
       ),
       body: Column(
         children: [
+          /// ------------------ search text filed ------------------->
           Padding(
             padding: EdgeInsets.all(16.w),
             child: CustomTextField(
@@ -125,6 +126,7 @@ class _AllProductViewState extends State<_AllProductView> {
                   if (state.products.isEmpty) {
                     return const Center(child: Text('No products found.'));
                   }
+                  ///------------- Product list --------------->
                   return GridView.builder(
                     controller: _scrollController,
                     padding: EdgeInsets.all(10.w),

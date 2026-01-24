@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:testing/features/home/presentation/pages/product_details_page.dart';
 import '../../../features/chat/presentation/pages/chat_page.dart';
-import '../../../features/chat/presentation/pages/message_page.dart';
 import '../../../features/home/presentation/pages/all_product_page.dart';
 import '../../../features/home/presentation/pages/home_page.dart';
 import '../../../features/main/presentation/pages/main_page.dart';
@@ -22,12 +21,6 @@ class AppRoute {
     debugLogDiagnostics: true,
     routes: [
 
-      //message route
-      GoRoute(
-        name: RoutePath.messagePage,
-        path: RoutePath.messagePagePath,
-        builder: (context, state) => MessagePage(),
-      ),
 
 
       GoRoute(

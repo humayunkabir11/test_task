@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import '../config/strings/api_endpoint.dart';
-import '../utils/file_type_util.dart';
 import 'package:intl/intl.dart';
 extension NumberParsing on String {
   int parseInt() {
@@ -185,6 +184,7 @@ extension FormateDate on DateTime? {
   }
 
 }
+/*
 
 extension FileTypeColor on FileType {
   Color get color {
@@ -209,4 +209,4 @@ extension FileTypeColor on FileType {
         return Color(0xFFBDBDBD); // Light Gray
     }
   }
-}
+}*/
