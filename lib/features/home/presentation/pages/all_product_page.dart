@@ -129,7 +129,7 @@ class _AllProductViewState extends State<_AllProductView> {
                   ///------------- Product list --------------->
                   return GridView.builder(
                     controller: _scrollController,
-                    padding: EdgeInsets.all(10.w),
+                    padding: EdgeInsets.symmetric(horizontal : 20.w, vertical: 12.h),
                     gridDelegate:
                         SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
