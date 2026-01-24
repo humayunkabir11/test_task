@@ -66,6 +66,7 @@ class _HomePageState extends State<HomePage> {
       value: _homeBloc,
       child: Scaffold(
         appBar: CustomAppBar(
+            backgroundColor:  Color(0xffF8F8F8),
           title: CustomTextField(
             controller: _searchController,
             hintText: 'Search products',
@@ -74,6 +75,7 @@ class _HomePageState extends State<HomePage> {
             filledColor: Colors.white,
             enabled: true,
             borderRadius: 8,
+
             onChanged: _onSearchChanged,
             onFieldSubmitted: (query) {
               if (_debounce?.isActive ?? false) _debounce!.cancel();
@@ -83,13 +85,13 @@ class _HomePageState extends State<HomePage> {
             },
             suffixIcon: _searchController.text.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      if (_debounce?.isActive ?? false) _debounce!.cancel();
-                      _searchController.clear();
-                      _homeBloc.add(LoadProductsEvent());
-                    },
-                  )
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                if (_debounce?.isActive ?? false) _debounce!.cancel();
+                _searchController.clear();
+                _homeBloc.add(LoadProductsEvent());
+              },
+            )
                 : SizedBox.shrink(),
           ),
           centerTitle: true,
@@ -97,9 +99,23 @@ class _HomePageState extends State<HomePage> {
         ),
         body: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            if (state is HomeLoading) {
+            if (state is HomeLoading && state is! HomeLoaded) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is HomeError) {
+               if (state.message.toLowerCase().contains("no internet")) {
+                    return Center(child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.wifi_off, size: 60, color: Colors.grey),
+                         Gap(10),
+                        Text("No Internet Connection",style: interRegular.copyWith(color:Colors.grey),),
+                         Gap(10),
+                        ElevatedButton(onPressed: (){
+                             _homeBloc.add(LoadHomeDataEvent());
+                        }, child: const Text("Retry"))
+                      ],
+                    ));
+               }
               return Center(child: Text(state.message));
             } else if (state is HomeLoaded) {
               return SingleChildScrollView(
@@ -107,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Gap(16),
+                    Gap(8),
                     if (state.homeData.homepageCategories != null &&
                         state.homeData.homepageCategories!.isNotEmpty) ...[
                       Container(
@@ -184,9 +200,12 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Gap(10.h),
+                    if (state.homeData.newArrivalProducts!.isEmpty)
+                      const Center(child: Text('No products found')),
+
                     if (state.homeData.newArrivalProducts != null)
 
-                      GridView.builder(
+                        GridView.builder(
                         shrinkWrap: true,
                         padding: EdgeInsets.symmetric(
                             horizontal: 20.w, vertical: 12.h),

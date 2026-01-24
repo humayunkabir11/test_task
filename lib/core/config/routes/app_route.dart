@@ -7,7 +7,6 @@ import '../../../features/home/presentation/pages/all_product_page.dart';
 import '../../../features/home/presentation/pages/home_page.dart';
 import '../../../features/main/presentation/pages/main_page.dart';
 import '../../../features/profile/presentation/pages/profile_page.dart';
-import '../../../features/splash/presentation/pages/splash_page.dart';
 import 'route_path.dart';
 
 class AppRoute {
@@ -18,15 +17,10 @@ class AppRoute {
   static final _profileNavigatorKey = GlobalKey<NavigatorState>();
 
   static final GoRouter _routerX = GoRouter(
-    initialLocation: RoutePath.splashPagePath,
+    initialLocation: RoutePath.mainPagePath,
     navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: true,
     routes: [
-      GoRoute(
-        name: RoutePath.splashPage,
-        path: RoutePath.splashPagePath,
-        builder: (context, state) => SplashPage(),
-      ),
 
       //message route
       GoRoute(
@@ -86,7 +80,7 @@ class AppRoute {
             ],
           ),
 
-          ///Attendance branch
+          ////Chat branch
           StatefulShellBranch(
             initialLocation: RoutePath.attendancePagePath,
             navigatorKey: _attendanceNavigatorKey,
@@ -101,7 +95,7 @@ class AppRoute {
             ],
           ),
 
-          ///Chat branch
+          //order
           StatefulShellBranch(
             initialLocation: RoutePath.chatPagePath,
             navigatorKey: _chatNavigatorKey,

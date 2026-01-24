@@ -1,7 +1,6 @@
 class RoutePath {
   ///splash page
-  static const String splashPage = '/splashPage';
-  static const String splashPagePath = '/splashPagePath';
+
 
   ///main page
   static const String mainPage = '/mainPage';
@@ -32,11 +31,5 @@ class RoutePath {
   static const String profilePage = '/profilePage';
   static const String profilePagePath = '/profilePagePath';
 
-  /// select rule
-  static const String selectRolePage = '/selectRolePage';
-  static const String selectRolePagePath = '/selectRolePagePath';
 
-  ///login page
-  static const String loginPage = '/loginPage';
-  static const String loginPagePath = '/loginPagePath';
 }

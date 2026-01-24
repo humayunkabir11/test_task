@@ -28,7 +28,6 @@ Future<void> initDependencies() async {
         await sl<SecureStorageService>().deleteAll();
         await sl<SharedPrefService>().clear();
 
-        AppRoute.router.goNamed(RoutePath.loginPage);
       },
       getToken: () {
         return sl<SecureStorageService>().read(SecureKeys.accessToken);

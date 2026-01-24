@@ -24,13 +24,16 @@ class ProductDetailsPage extends StatelessWidget {
     return BlocProvider(
       create: (context) =>
           sl<ProductDetailsBloc>()..add(LoadProductDetailsEvent(slug)),
-      child: const _ProductDetailsView(),
+      child: _ProductDetailsView(slug: slug),
     );
   }
 }
 
+
 class _ProductDetailsView extends StatelessWidget {
-  const _ProductDetailsView();
+  final String slug;
+  const _ProductDetailsView({required this.slug});
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +54,23 @@ class _ProductDetailsView extends StatelessWidget {
       ),
       body: BlocBuilder<ProductDetailsBloc, ProductDetailsState>(
         builder: (context, state) {
-          if (state is ProductDetailsLoading) {
+          if (state is ProductDetailsLoading && state is! ProductDetailsLoaded) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ProductDetailsError) {
+             if (state.message.toLowerCase().contains("no internet")) {
+                  return Center(child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.wifi_off, size: 60, color: Colors.grey),
+                       Gap(10),
+                      Text("No Internet Connection",style: interRegular.copyWith(color:Colors.grey),),
+                       Gap(10),
+                      ElevatedButton(onPressed: (){
+                           context.read<ProductDetailsBloc>().add(LoadProductDetailsEvent(slug));
+                      }, child: const Text("Retry"))
+                    ],
+                  ));
+             }
             return Center(child: Text(state.message));
           } else if (state is ProductDetailsLoaded) {
             final product = state.productDetails.product;
@@ -68,7 +85,7 @@ class _ProductDetailsView extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ///------------------------ gallery image and image preview ---------->
+                   ///------------------------ gallery image and image preview ---------->
                         _buildProductImage(state.productDetails),
                         Padding(
                           padding: const EdgeInsets.all(16.0),
